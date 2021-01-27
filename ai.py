@@ -10,13 +10,28 @@ class Frontier():
         return self.frontier[len(self.frontier)-1]
 
 class TicTacToe():
-    def __init__(self,initialturn):
+    def __init__(self,initialturn,difficulty):
         self.initialturn = bool(initialturn)
+        self.findDifficultyLevel(difficulty)
         self.sol = dict()
         self.frontier = Frontier()
         self.initialstate = [[' ','#',' ','#',' '],['#','#','#','#','#'],[' ','#',' ','#',' '],['#','#','#','#','#'],[' ','#',' ','#',' ']]
         self.height = len(self.initialstate)
         self.width = max(len(value) for value in self.initialstate)
+
+
+
+    def findDifficultyLevel(self,difficulty):
+        if difficulty == -1:
+            self.dificultylevel = 1
+            return self.dificultylevel
+        elif difficulty == 0:
+            self.dificultylevel = 3
+            return self.dificultylevel
+        elif difficulty == 1:
+            self.dificultylevel = 7
+            return self.dificultylevel
+
 
 
 
@@ -192,7 +207,7 @@ class TicTacToe():
         bestaction = None
         for action in self.actions(state):
             board = self.result(self.frontier.giveFrontier(),action)
-            value =  self.minimax(board,True)
+            value =  self.minimax(board,True,0)
             board[action[0]][action[1]] = " "
             if value < minvalue:
                 minvalue = value
@@ -200,20 +215,22 @@ class TicTacToe():
 
         self.frontier.newFrontier(self.result(self.frontier.giveFrontier(),bestaction))
 
-    def minimax(self,board,ismax):
+    def minimax(self,board,ismax,depth):
+        if depth == self.dificultylevel:
+            return self.utility(board)
         if self.terminal(board):
             return self.utility(board)
 
         if ismax:
             v = -10000
             for action in self.actions(board):
-                v = max(v,self.minimax(self.result(board,action),False))
+                v = max(v,self.minimax(self.result(board,action),False,depth=depth+1))
                 board[action[0]][action[1]] = ' '
             return v
         elif not ismax:
             v = 10000
             for action in self.actions(board):
-                v = min(v,self.minimax(self.result(board,action),True))
+                v = min(v,self.minimax(self.result(board,action),True,depth=depth+1))
                 board[action[0]][action[1]] = ' '
             return v
 
@@ -236,10 +253,24 @@ print()
 print("You have to select the positon where you want to play by providing row and column")
 print("row start from 0,2,4 and column always be either 0,2,4")
 print()
+print('please select difficulty level :- -1 for easy , 0 for normal and 1 for hard ')
+while True:
+    difficulty = int(input("Difficulty Level :- "))
+    if difficulty == -1 or difficulty == 0 or difficulty == 1:
+        break
+    else:
+        print()
+        print('Please give valid input')
+        print()
 print('please select turn :- press 1 for your initial turn and press 0 for ai initial turn')
 initialturn = int(input("Ans :- "))
-tictactoe = TicTacToe(initialturn)
+tictactoe = TicTacToe(initialturn,difficulty)
 tictactoe.startgame()
+
+
+
+
+
 
 
 
